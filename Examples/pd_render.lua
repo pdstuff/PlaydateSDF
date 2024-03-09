@@ -3,7 +3,7 @@
 -- be used to build sprite images and is useful for testing SDFs.
 import "CoreLibs/object"
 import "CoreLibs/graphics"
-import "PlaydateSDF/SDF2D.lua"
+import "Source/SDF2D.lua"
 
 pd = playdate
 gfx	= pd.graphics

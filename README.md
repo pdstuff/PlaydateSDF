@@ -17,6 +17,8 @@ Examples included:
 - pd_sprites.lua showing how to do so with sprites
 - pd_raymarching.lua demonstrates the technique of sphere-assisted ray marching which can be used for effects
 - pd_render.lua simply visualises an SDF shape
+- pd_render.lua simply visualises an SDF shape
+- pd_bench.lua benchmarks the SDFs
 
 ![Collisions](https://github.com/pdstuff/PlaydateSDF/blob/main/Assets/collisions.gif)
 

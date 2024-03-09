@@ -3,7 +3,7 @@
 -- could be built in the background.
 import "CoreLibs/object"
 import "CoreLibs/graphics"
-import "PlaydateSDF/SDF2D.lua"
+import "Source/SDF2D.lua"
 
 gfx	= playdate.graphics
 v = playdate.geometry.vector2D.new

@@ -3,7 +3,7 @@
 import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
-import "PlaydateSDF/SDF2D.lua"
+import "Source/SDF2D.lua"
 
 pd = playdate
 gfx	= pd.graphics
