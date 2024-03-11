@@ -13,6 +13,21 @@ playdate.setMinimumGCTime(5)
 
 local sw, sh = pd.display.getSize()
 
+--[[
+Calculate a normalized gradient from nearby points to find the direction of the
+shortest path to the surface. We compute the gradient vector, and then normalize
+the magnitude to remove local variations of the slope. This approach provides a 
+directionally accurate vector for collision responses or for guiding movements.
+--]]
+function calcNormalizedGradient(p, f, o, params) -- p:point, o:offset, f:sdf, params:params to sdf
+	local eps = 1e-4
+	local ds = {f(vec2(p.x + eps, p.y)-o, table.unpack(params)),
+				f(vec2(p.x - eps, p.y)-o, table.unpack(params)),
+				f(vec2(p.x, p.y + eps)-o, table.unpack(params)),
+				f(vec2(p.x, p.y - eps)-o, table.unpack(params))}
+	return vec2((ds[1]-ds[2])/(2*eps), (ds[3]-ds[4])/(2*eps)):normalized()
+end
+
 -- We need a drawing function for each of our shape SDF functions
 function drawDemoCircle(p,t) -- for sdCircle
 	gfx.setColor(playdate.graphics.kColorBlack)
@@ -56,6 +71,10 @@ function drawDemoDPad(p,t) -- for sdDPad()
 	gfx.fillCircleAtPoint(p.x, p.y-a+b, b)
 	gfx.fillCircleAtPoint(p.x, p.y+a-b, b)
 end
+
+
+local abs = math.abs
+local function opOnion(p, f, params, r) return abs(f(p, table.unpack(params))) - r end
 
 -- Demo: We can also "hollow out" a new shape from any primitive.
 function sdScreen(p, b)

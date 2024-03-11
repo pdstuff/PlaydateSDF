@@ -5,8 +5,10 @@ import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "Source/SDF2D.lua"
 
-gfx	= playdate.graphics
-v = playdate.geometry.vector2D.new
+local pd = playdate
+local geo = pd.geometry
+local gfx	= playdate.graphics
+local v = playdate.geometry.vector2D.new
 pd.display.setRefreshRate(50)
 
 local backgroundImage = gfx.image.new(400,220)

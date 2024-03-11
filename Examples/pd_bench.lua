@@ -1,4 +1,5 @@
 -- A benchmark of SDF functions on the playdate. Run it on device.
+-- It runs 100,000 tests per shape so is rather slow.
 import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "Source/SDF2D.lua"
@@ -47,7 +48,6 @@ local testObjects = {
 	{sdPolygon, 	"sdPolygon 4", 		vec2(0,0),		{{vec2(10,10), vec2(70,15), vec2(90,90), vec2(10,80)}}},
 	{sdParabola,	"sdParabola",		vec2(50,50), 	{0.025}},
 	{sdEllipse, 	"sdEllipse", 		vec2(50,50), 	{vec2(40,20)}},
-	{sdEllipse2, 	"sdEllipse", 		vec2(50,50), 	{vec2(40,20)}},
 	{sdTunnel, 		"sdTunnel", 		vec2(50,50),	{vec2(40,20)}},
 }
 
