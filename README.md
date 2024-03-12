@@ -8,6 +8,8 @@ The Playdate (https://play.date) is a tiny handheld game system with a measly 16
 
 SDFs allow us to efficiently detect precise collisions and to inform basic physics on how to respond to a collision. Since the SDF quantifies how deep into one another the objects have penetrated, we can use this information to push them apart to eliminate the overlap. The gradient of the SDF at the collision point gives the direction of the shortest path out of the collision. This direction can be used to realistically apply forces or adjust velocities.
 
+This repo is not a complex physics handler. It shows how to use SDFs to model some more complex physics interactions than the Playdate SDK offers out of the box but stops short of any continuous detection detection.
+
 Inigo Guilez (url) has pioneered and popularised the use of SDFs. This repository compromises primarily of Lua / Playdate ports of the OpenGL Shader Language (GLSL) 2D SDF's that Inigo published (https://iquilezles.org/articles/distfunctions2d/) with an MIT License.
 
 This repo contains the shapes: Circle, Box, Oriented Box, RoundedBox, Segment, Rhombus, Isosceles Trapezoid, Parallelogram, Isosceles Triangle, Equilateral Triangle, Triangle, Uneven Capsule, Regular Pentagon, Regular Hexagon, Regular Octagon, Hexagram, Star 5, Pie, Cut Disk, Arc, Horseshoe, Ring, Vesica, Oriented Vesica, Moon, Cross, Rounded X, Ellipse, Parabola, Tunnel, Regular Polygon, Quad.
@@ -17,11 +19,14 @@ Examples included:
 - pd_sprites.lua showing how to do so with sprites
 - pd_raymarching.lua demonstrates the technique of sphere-assisted ray marching which can be used for effects
 - pd_render.lua simply visualises an SDF shape
-- pd_render.lua simply visualises an SDF shape
 - pd_bench.lua benchmarks the SDFs
+- pd_complex showing a more complex use case
 
 ![Collisions](https://github.com/pdstuff/PlaydateSDF/blob/main/Assets/collisions.gif)
 
 ![Ray Marching](https://github.com/pdstuff/PlaydateSDF/blob/main/Assets/raymarch.gif)
 
 ![Sprites](https://github.com/pdstuff/PlaydateSDF/blob/main/Assets/sprites.gif)
+
+![Complex](https://github.com/pdstuff/PlaydateSDF/blob/main/Assets/complex.gif)
+
