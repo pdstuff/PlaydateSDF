@@ -9,7 +9,7 @@ AABB bounding box and tunnel controlled collision detection, plus helper methods
 import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
-import "Source/SDF2D.lua"
+import "Source/Lua/SDF2D.lua" -- Ensure you have put this file in the right location
 
 pd = playdate
 gfx	= pd.graphics
@@ -23,7 +23,7 @@ local sw, sh = pd.display.getSize()
 
 -- We'll build a sequence of quads along a bezier curve
 function drawQuad(p, q)
-	gfx.drawPolygon(q[1].x,q[1].y,q[2].x,q[2].y,q[3].x,q[3].y,q[4].x,q[4].y,q[1].x,q[1].y)
+	gfx.drawPolygon(q[1],q[2],q[3],q[4],q[5],q[6],q[7],q[8],q[1],q[2])
 end
 
 function bezierPoint(t, P0, P1, P2)
@@ -49,7 +49,7 @@ function buildBezierQuads ()
 							math.max(po[1].x, po[2].x, off[2].x, off[1].x),
 							math.min(po[1].y, po[2].y, off[2].y, off[1].y),
 							math.max(po[1].y, po[2].y, off[2].y, off[1].y)}
-			table.insert(terrain, {sdQuad, vec2(0,0), {po[1], po[2], off[2], off[1]}, bb, drawQuad})
+			table.insert(terrain, {sdQuad, vec2(0,0), {po[1].x, po[1].y, po[2].x, po[2].y, off[2].x, off[2].y, off[1].x, off[1].y}, bb, drawQuad})
 		end
 		po = off 
 	end
@@ -83,10 +83,10 @@ function Ball:draw() gfx.fillCircleAtPoint(self.radius, self.radius, self.radius
 
 function samplePoints(p, f, offset, params)
 	local eps = 1e-4
-	local ds = {f(vec2(p.x + eps, p.y)-offset, table.unpack(params)),
-			f(vec2(p.x - eps, p.y)-offset, table.unpack(params)),
-			f(vec2(p.x, p.y + eps)-offset, table.unpack(params)),
-			f(vec2(p.x, p.y - eps)-offset, table.unpack(params))}
+	local ds = {f(p.x + eps -offset.x, p.y-offset.y, table.unpack(params)),
+			f(p.x - eps-offset.x, p.y-offset.y, table.unpack(params)),
+			f(p.x-offset.x, p.y + eps-offset.y, table.unpack(params)),
+			f(p.x-offset.x, p.y - eps-offset.y, table.unpack(params))}
 	return vec2((ds[1]-ds[2])/(2*eps), (ds[3]-ds[4])/(2*eps)):normalized()
 end
 
@@ -102,7 +102,7 @@ function Ball:update()
 		if self.position.x > bb[1]-self.radius and self.position.x < bb[2]+self.radius -- cheap BB collision detection
 		   and self.position.y > bb[3]-self.radius and self.position.y < bb[4]+self.radius then
 			local f = o[1]
-			local dist = f(self.position-o[2], table.unpack(o[3])) -- expensive shape collision detection
+			local dist = f(self.position.x-o[2].x, self.position.y-o[2].y, table.unpack(o[3])) -- check shape collision detection
 			if dist < self.radius then
 				local normal = samplePoints(self.position, f, o[2], o[3]) -- calculate gradient
 				table.insert(collisions, {

@@ -1,9 +1,10 @@
 -- An example of how to implement ray marching with SDF functions on the Playdate.
 -- Ray marching is probably too slow for real time effects, but some effects like shadows
 -- could be built in the background.
+
 import "CoreLibs/object"
 import "CoreLibs/graphics"
-import "Source/SDF2D.lua"
+import "Source/Lua/SDF2D.lua" -- Ensure you have put this file in the right location
 
 local pd = playdate
 local geo = pd.geometry
@@ -24,11 +25,11 @@ gfx.setLineWidth(6)
 gfx.drawArc(100, 190, 20, 45, 315)
 gfx.popContext(backgroundImage)
 
-function getMinDist(p)	
-	return math.min(sdCircle(p - v(200, 90), 20), 
-					sdMoon(p - v(100, 90), 20, 30, 24),
-					sdArc(p - v(100, 190), v(math.sin(135*math.pi/180),math.cos(135*math.pi/180)), 20, 3),
-					sdSegment(p, v(200,10), v(370,100)))
+function getMinDist(px, py)	
+	return math.min(sdCircle(px-200,py-90, 20), 
+					sdMoon(px-100, py-90, 20, 30, 24),
+					sdArc(px-100, py-190, math.sin(135*math.pi/180),math.cos(135*math.pi/180), 20, 3),
+					sdSegment(px, py, 200,10,370,100))
 end
 
 function castRay(o, a)
@@ -39,7 +40,7 @@ function castRay(o, a)
 		
 		local cx, cy = o.x + math.cos(a) * cd, o.y + math.sin(a) * cd		
 		gfx.drawLine(o.x, o.y, cx, cy)
-		local d = getMinDist(v(o.x + math.cos(a) * cd, o.y + math.sin(a) * cd))		
+		local d = getMinDist(o.x + math.cos(a) * cd, o.y + math.sin(a) * cd)		
 		if d < 1 then break end
 		gfx.drawCircleAtPoint(cx, cy, d)
 		ld = d

@@ -3,13 +3,12 @@
 import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
-import "Source/SDF2D.lua"
+import "Source/Lua/SDF2D.lua" -- Ensure you have put this file in the right location
 
 pd = playdate
 gfx	= pd.graphics
 vec2 = pd.geometry.vector2D.new
-pd.display.setRefreshRate(40) -- only 40 for 2 balls
-playdate.setMinimumGCTime(5)
+pd.display.setRefreshRate(50)
 
 local sw, sh = pd.display.getSize()
 
@@ -21,10 +20,10 @@ directionally accurate vector for collision responses or for guiding movements.
 --]]
 function calcNormalizedGradient(p, f, o, params) -- p:point, o:offset, f:sdf, params:params to sdf
 	local eps = 1e-4
-	local ds = {f(vec2(p.x + eps, p.y)-o, table.unpack(params)),
-				f(vec2(p.x - eps, p.y)-o, table.unpack(params)),
-				f(vec2(p.x, p.y + eps)-o, table.unpack(params)),
-				f(vec2(p.x, p.y - eps)-o, table.unpack(params))}
+	local ds = {f(p.x + eps-o.x, p.y-o.y, table.unpack(params)),
+				f(p.x - eps-o.x, p.y-o.y, table.unpack(params)),
+				f(p.x-o.x, p.y + eps-o.y, table.unpack(params)),
+				f(p.x-o.x, p.y - eps-o.y, table.unpack(params))}
 	return vec2((ds[1]-ds[2])/(2*eps), (ds[3]-ds[4])/(2*eps)):normalized()
 end
 
@@ -36,11 +35,13 @@ end
 
 function drawDemoBox(p,t) -- for sdBox
 	gfx.setColor(playdate.graphics.kColorBlack)
-	gfx.fillRect(p.x-t[1].x, p.y-t[1].y, t[1].x*2, t[1].y*2)
+	gfx.fillRect(p.x-t[1], p.y-t[2], t[1]*2, t[2]*2)
 end
 
-function drawOrientedBox(p,q) -- for sdOrientedBox
-	local s, e, t = table.unpack(q)
+function drawOrientedBox(p, q) -- for sdOrientedBox
+	local sx, sy, ex, ey, t = table.unpack(q)
+	local s = vec2(sx, sy)
+	local e = vec2(ex, ey)
 	local d = (e-s) / (e-s):magnitude()
 	local P = vec2(-d.y, d.x)
 	local c1,c2,c3,c4 = s+(P*t), s-(P*t), e-(P*t), e+(P*t)
@@ -54,15 +55,14 @@ function noDraw() end
 -- of the primitives. Here we combine two rounded boxes into a "DPad" shape. 
 -- Demo: if we don't always need true distance when far away, we can first 
 -- run a cheaper check like sdCircle that encloses the shape.
-function sdDPad(p, b)
-	if sdCircle(p, b.x+b.y) > 0 then return math.huge end -- shortcut
-	local br = vec2(b.y, b.x)
-	return math.min(sdRoundedBox(p, b, {b.y, b.y, b.y, b.y}),
-					sdRoundedBox(p, br, {b.y, b.y, b.y, b.y}))
+function sdDPad(px, py, bx, by)
+	if sdCircle(px, py, bx+by) > 0 then return math.huge end -- shortcut
+	return math.min(sdRoundedBox(px, py, bx, by, by, by, by, by),
+					sdRoundedBox(px, py, by, bx, by, by, by, by))
 end
 
 function drawDemoDPad(p,t) -- for sdDPad()
-	local a,b = t[1]:unpack()
+	local a, b = table.unpack(t)
 	gfx.setColor(playdate.graphics.kColorBlack)
 	gfx.fillRect(p.x-a+b, p.y-b, (a-b)*2, b*2)
 	gfx.fillCircleAtPoint(p.x-a+b, p.y, b)
@@ -74,19 +74,21 @@ end
 
 
 local abs = math.abs
-local function opOnion(p, f, params, r) return abs(f(p, table.unpack(params))) - r end
+local function opOnion(px, py, f, params, r) 
+	return abs(f(px, py, table.unpack(params))) - r 
+end
 
 -- Demo: We can also "hollow out" a new shape from any primitive.
-function sdScreen(p, b)
--- function opOnion(p, f, params, r) return math.abs(f(p, table.unpack(params))) - r end
-	return opOnion(p, sdBox, {b}, 7)
+function sdScreen(px, py, b)
+	return opOnion(px, py, sdBox, b, 7)
 end
 	
 function drawScreen(p,t) -- for sdScreen
+	t = table.unpack(t)
 	gfx.setColor(playdate.graphics.kColorBlack)
-	gfx.fillRect(p.x-t[1].x-t[2], p.y-t[1].y-t[2], (t[1].x+t[2])*2, (t[1].y+t[2])*2)
+	gfx.fillRect(p.x-t[1]-t[3], p.y-t[2]-t[3], (t[1]+t[3])*2, (t[2]+t[3])*2)
 	gfx.setColor(playdate.graphics.kColorClear)
-	gfx.fillRect(p.x-t[1].x+t[2], p.y-t[1].y+t[2], (t[1].x-t[2])*2, (t[1].y-t[2])*2)
+	gfx.fillRect(p.x-t[1]+t[3], p.y-t[2]+t[3], (t[1]-t[3])*2, (t[2]-t[3])*2)
 end
 
 function drawNGonByApothem(p, q)
@@ -105,16 +107,16 @@ end
 -- A table to hold the scene of objects.
 -- It's better/easier to use Sprites with the management helpers they inherit, though.
 terrain = {
-	{sdScreen, vec2(200,90), {vec2(110,60), 3}, drawScreen},
+	{sdScreen, vec2(200,90), {{110,60,3}}, drawScreen},
 	{sdCircle, vec2(230,180), {15}, drawDemoCircle},
 	{sdCircle, vec2(280,180), {15}, drawDemoCircle},
 	{sdPentagon, vec2(200,65), {35, 5}, drawNGonByApothem},
-	{sdOrientedBox, vec2(0,0), {vec2(120,100), vec2(200,130), 8}, drawOrientedBox},
-	{sdDPad, vec2(130,200), {vec2(32,8)}, drawDemoDPad},
-	{sdBox, vec2(0,sh/2), {vec2(sw/6,sh/2+5)}, drawDemoBox}, -- left border
-	{sdBox, vec2(sw,sh/2), {vec2(sw/6,sh/2+5)}, drawDemoBox}, -- right border
-	{sdBox, vec2(sw/2,-5), {vec2(sw/2+5,5)}, noDraw}, -- top border
-	{sdBox, vec2(sw/2,sh+5), {vec2(sw/2+5,5)}, noDraw}, -- bottom border
+	{sdOrientedBox, vec2(0,0), {120,100, 200,130, 8}, drawOrientedBox},
+	{sdDPad, vec2(130,200), {32,8}, drawDemoDPad},
+	{sdBox, vec2(0,sh/2), {sw/6,sh/2+5}, drawDemoBox}, -- left border
+	{sdBox, vec2(sw,sh/2), {sw/6,sh/2+5}, drawDemoBox}, -- right border
+	{sdBox, vec2(sw/2,-5), {sw/2+5,5}, noDraw}, -- top border
+	{sdBox, vec2(sw/2,sh+5), {sw/2+5,5}, noDraw}, -- bottom border
 }
 
 function drawShapes(terrain) -- draw the scene
@@ -158,7 +160,7 @@ function Ball:manageCollisions()
 	for i=1, #terrain do
 		local o = terrain[i]
 		local f = o[1]
-		local dist = f(self.position-o[2], table.unpack(o[3]))
+		local dist = f(self.position.x-o[2].x,self.position.y-o[2].y, table.unpack(o[3]))
 		if dist < self.radius then
 			self:resolveCollision(dist, f, o[2], o[3])
 		end
