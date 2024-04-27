@@ -2,8 +2,8 @@
 -- available at https://iquilezles.org/articles/distfunctions2d/
 --
 -- MIT licence: please credit
--- -- Inigo Quilez https://iquilezles.org
--- -- robga https://github.com/pdstuff/PlaydateSDF
+-- -- @robga https://github.com/pdstuff/PlaydateSDF
+-- -- @iq https://iquilezles.org
 --
 -- Although these have been designed for the Playdate handheld system, they should be useful in any
 -- Lua environment (eg Love2D) without GPU.
@@ -35,6 +35,23 @@ function sdSegment(px, py, ax, ay, bx, by)
 	return sqrt(gx*gx+gy*gy)
 end
 
+-- Segment in L infinity norm metric space (https://www.shadertoy.com/view/7l2GWR)
+function sdSegmentLinf(px, py, ax, ay, bx, by)
+	local pax = px-ax
+	local pay = py-ay
+	local bax = bx-ax
+	local bay = by-ay
+	local s = (bax * bay > 0.0) and 1.0 or -1.0
+	local m = (pay+s*pax) / (bay+s*bax)
+	local h0 = ((m < 1) and m or 1)
+	local h = ((h0 > 0) and h0 or 0)
+	local pbx = pax-h*bax
+	local pby = pay-h*bay
+	local qx = ((pbx >= 0) and pbx or -pbx)
+	local qy = ((pby >= 0) and pby or -pby)
+	return ((qx > qy) and qx or qy)
+end
+
 -- Box (https://www.youtube.com/watch?v=62-pRVZuS5c)
 function sdBox(px, py, bx, by)
 	px = ((px >= 0) and px or -px) - bx
@@ -45,6 +62,13 @@ function sdBox(px, py, bx, by)
 	local m = ((px > py) and px or py)
 	local id = ((m < 0) and m or 0)
 	return od + id
+end
+
+-- Box distance in L infinity norm space (https://www.shadertoy.com/view/Nlj3WR)
+function sdBoxLinf(px, py, bx, by)
+	px = ((px >= 0) and px or -px) - bx
+	py = ((py >= 0) and py or -py) - by
+	return ((px > py) and px or py)
 end
 
 -- Oriented Box (https://www.shadertoy.com/view/stcfzn)
@@ -104,6 +128,24 @@ function sdRhombus(px, py, bx, by)
 	local r = px*by+py*bx-bx*by	
 	return sqrt(dvx*dvx+dvy*dvy) * (r > 0 and 1 or r < 0 and -1 or 0)
 end
+
+-- Rhombus L Inf norm (https://www.shadertoy.com/view/7tj3Wz)
+function sdRhombusLinf(px, py, w, h)
+	px = (px >= 0) and px or -px
+	py = (py >= 0) and py or -py	
+	px = px - w
+	local m = (py-px)/(h+w)
+	local f0 = ((m < 1) and m or 1)
+	local f = ((f0 > 0) and f0 or 0)
+	local xfw = px+f*w
+	local yfh = py-f*h
+	local qx = (xfw >= 0) and xfw or -xfw
+	local qy = (yfh >= 0) and yfh or -yfh
+	local m = h*px+w*py
+	local s = (m > 0) and 1 or -1
+	local r = ((qx > qy) and qx or qy)
+	return r * s
+end	
 
 -- Trapezoid (https://www.shadertoy.com/view/MlycD3)
 function sdTrapezoid(px, py, r1, r2, he) -- r1:base width,  r2:cap width, he:height
@@ -601,6 +643,20 @@ function sdEllipse(px, py, ex, ey)
 	return dp < n and -d or d
 end
 
+-- Ellipse in L Inf Norm space https://www.shadertoy.com/view/7tj3DR
+function sdEllipseLinf(px, py, ex, ey)
+	px = ((px >= 0) and px or -px)
+	py = ((py >= 0) and py or -py)
+	local ay = px - ex
+	local ax = py - ey
+	px = ((px > ax) and px or ax)
+	py = ((py > ay) and py or ay)
+	local m = ex * ex + ey * ey
+	local d = py - px
+	local s = sqrt(m-d*d)	
+	return px - (ey * s - ex * d) * ex / m
+end
+	
 -- Star 5 (https://www.shadertoy.com/view/3tSGDy)
 function sdStar5(px, py, r, rf)
 	local kx = 0.809016994375
@@ -636,17 +692,17 @@ function sdHexagram(px, py, r)
 	py = ((py >= 0) and py or -py)
 	local d1 = kx * px + ky * py
 	local dd1 = 2.0 * ((d1 < 0) and d1 or 0)
-	px -= dd1 * kx
-	py -= dd1 * ky
+	px = px - dd1 * kx
+	py = py - dd1 * ky
 	local d2 = ky * px + kx * py
 	local dd2 = 2.0 * ((d2 < 0) and d2 or 0)
-	px -= dd2 * ky
-	py -= dd2 * kx	
+	px = px - dd2 * ky
+	py = py - dd2 * kx	
 	local m = r * kw
 	local mm = ((px < m) and px or m)
 	local n = r * kz
-	px -= ((n > mm) and n or mm)
-	py -= r
+	px = px - ((n > mm) and n or mm)
+	py = py - r
 	return sqrt(px * px + py * py) * (py > 0 and 1 or py < 0 and -1 or 0)
 end
 
@@ -729,11 +785,11 @@ function sdRegularPolygon(px, py, r, n )
 	px = cos(bn) * pmag
 	local sbn = sin(bn)
 	py = ((sbn >= 0) and sbn or -sbn) * pmag
-	px -= acsx*r
-	py -= acsy*r
+	px = px - acsx*r
+	py = py - acsy*r
 	local ar = acsy * r
 	local m = ((-py < ar) and -py or ar)
-	py += ((0 > m) and 0 or m)
+	py = py + ((0 > m) and 0 or m)
 	return sqrt(px*px+py*py) * (px > 0 and 1 or px < 0 and -1 or 0)
 end
 

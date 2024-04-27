@@ -3,10 +3,13 @@
 
 float sdCircle(float x, float y, float r);
 float sdBox(float px, float py, float bx, float by);
+float sdBoxLinf(float px, float py, float bx, float by);
 float sdRoundedBox(float px, float py, float bx, float by, float rw, float rx, float ry, float rz);
 float sdOrientedBox(float px, float py, float ax, float ay, float bx, float by, float th);
 float sdSegment(float px, float py, float ax, float ay, float bx, float by); 
+float sdSegmentLinf(float px, float py, float ax, float ay, float bx, float by); 
 float sdRhombus(float px, float py, float bx, float by);
+float sdRhombusLinf(float px, float py, float bx, float by);
 float sdTrapezoid(float px, float py, float r1, float r2, float he);
 float sdParallelogram(float px, float py, float wi, float he, float sk);
 float sdTriangle(float px, float py, float p0x, float p0y, float p1x, float p1y, float p2x, float p2y);
@@ -31,6 +34,7 @@ float sdRoundedX(float px, float py, float w, float r);
 float sdParabola(float px, float py, float k);
 float sdTunnel(float px, float py, float whx, float why);
 float sdEllipse(float px, float py, float ex, float ey);
+float sdEllipseLinf(float px, float py, float ex, float ey);
 float sdRegularPolygon(float px, float py, float r, int n);
 float sdPolygon(float px, float py, float vx[], float vy[], int num);
 float sdRoundSquare(float px, float py, float s, float r);

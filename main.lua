@@ -54,6 +54,12 @@ local testObjects = {
 {sdPolygon, 	"sdPolygon 4", 		vec2(0,0), {{10,70,90,10},{10,15,90,80},4}},
 }
 
+local testObjects = {
+{sdSegmentLinf,		"sdSegmentLinf",		vec2(0,0), 		{20,20,80,80}},
+{sdBoxLinf,			"sdBoxLinf",			vec2(50,50), 	{40,40}},
+{sdRhombusLinf,		"sdRhombusLinf",		vec2(50,50), 	{50,40}},
+{sdEllipseLinf, 	"sdEllipseLinf", 		vec2(50,50), 	{40,20}},
+}
 function playdate.update()
 	
 	for i=1,#testObjects do

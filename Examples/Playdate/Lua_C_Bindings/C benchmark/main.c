@@ -88,6 +88,10 @@ int benchmark(lua_State* L)
 			case 35: d = sdOctagon(qx-x,qy-y,90); break;
 			case 36: d = sdRegularPolygon(qx-x,qy-y,90,8); break;
 			case 37: d = sdPolygon(x, y, vx, vy, 4); break;
+			case 38: d = sdSegmentLinf(x, y, 50, 220, 350, 20); break;
+			case 39: d = sdBoxLinf(qx-x, qy-y, 160, 70); break;
+			case 40: d = sdRhombusLinf(qx-x, qy-y, 100, 30); break;
+			case 41: d = sdEllipseLinf(x-qx,y-qy,160,80); break;
 			}	
 						
 			totald+=d; // use the value to ensure compiler doesn't strip it

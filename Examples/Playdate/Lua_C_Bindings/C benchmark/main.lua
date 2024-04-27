@@ -16,7 +16,7 @@ function calculateAverage(numbers)
 	return average
 end
 
-local labels = {"sdCircle", "sdSegment", "sdBox", "sdOrientedBox", "sdRoundedBox", "sdRoundSquare", "sdRhombus", "sdTrapezoid", "sdParallelogram", "sdEquilateralTriangle", "sdTriangleIsosceles", "sdTriangle", "sdQuad", "sdUnevenCapsule", "sdEgg", "sdPie", "sdCutDisk", "sdMoon", "sdVesica", "sdOrientedVesica", "sdTunnel", "sdArc", "sdRing", "sdHorseshoe", "sdParabola", "sdCross", "sdRoundedX", "sdEllipse", "sdStar5", "sdHexagram", "sdPentagon", "sdRegularPolygon (5)", "sdHexagon", "sdRegularPolygon (6)", "sdOctagon", "sdRegularPolygon (8)", "sdPolygon"}
+local labels = {"sdCircle", "sdSegment", "sdBox", "sdOrientedBox", "sdRoundedBox", "sdRoundSquare", "sdRhombus", "sdTrapezoid", "sdParallelogram", "sdEquilateralTriangle", "sdTriangleIsosceles", "sdTriangle", "sdQuad", "sdUnevenCapsule", "sdEgg", "sdPie", "sdCutDisk", "sdMoon", "sdVesica", "sdOrientedVesica", "sdTunnel", "sdArc", "sdRing", "sdHorseshoe", "sdParabola", "sdCross", "sdRoundedX", "sdEllipse", "sdStar5", "sdHexagram", "sdPentagon", "sdRegularPolygon (5)", "sdHexagon", "sdRegularPolygon (6)", "sdOctagon", "sdRegularPolygon (8)", "sdPolygon", "sdSegmentLinf", "sdBoxLinf", "sdRhombusLinf", "sdEllipseLinf"}
 
 function playdate.update()
 

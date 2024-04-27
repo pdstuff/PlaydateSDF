@@ -32,6 +32,21 @@ float sdSegment(float px, float py, float ax, float ay, float bx, float by)
 	return sqrtf(gx*gx+gy*gy);
 }
 
+// Segment in L infinity norm metric space (https://www.shadertoy.com/view/7l2GWR)
+float sdSegmentLinf(float px, float py, float ax, float ay, float bx, float by) 
+{
+	float pax = px-ax;
+	float pay = py-ay;
+	float bax = bx-ax;
+	float bay = by-ay;
+	float s = (bax*bay>0.0)?1.0f:-1.0f;	
+	float m = (pay+s*pax) / (bay+s*bax);
+	float h = fmaxf(0.0f, fminf(1.0f, m));
+	float qx = fabsf(pax-h*bax);
+	float qy = fabsf(pay-h*bay);
+	return fmaxf(qx,qy);
+}
+
 // Box (https://www.youtube.com/watch?v=62-pRVZuS5c)
 float sdBox(float px, float py, float bx, float by) {
 	px = fabsf(px) - bx;
@@ -41,6 +56,14 @@ float sdBox(float px, float py, float bx, float by) {
 	float od = sqrtf(dx*dx + dy*dy);
 	float id = fminf(fmaxf(px, py), 0.0f);
 	return od + id;
+}
+
+// Box distance in L infinity norm space (https://www.shadertoy.com/view/Nlj3WR)
+float sdBoxLinf(float px, float py, float bx, float by) 
+{
+	px = fabsf(px)-bx;
+	py = fabsf(py)-by;	
+	return fmaxf(px,py);
 }
 
 // Oriented Box (https://www.shadertoy.com/view/stcfzn)
@@ -93,6 +116,18 @@ float sdRhombus(float px, float py, float bx, float by)
 	float dvy = py-((by*0.5f)*(1.0f+h));
 	float r = px*by+py*bx-bx*by;	
 	return sqrtf(dvx*dvx+dvy*dvy) * ((r>0)-(r<0));
+}
+
+// Rhombus L Inf norm (https://www.shadertoy.com/view/7tj3Wz)
+float sdRhombusLinf(float px, float py, float w, float h) 
+{
+	px = fabsf(px);
+	py = fabsf(py);
+	px -= w;
+	float f = fmaxf(0.0f, fminf((py-px)/(h+w), 1.0f));
+	float qx = fabsf(px+f*w);
+	float qy = fabsf(py-f*h);
+	return fmaxf(qx,qy)*((h*px+w*py>0.0f)?1.0f:-1.0f);
 }
 
 // Trapezoid (https://www.shadertoy.com/view/MlycD3)
@@ -531,6 +566,19 @@ float sdEllipse(float px, float py, float ex, float ey) {
 	float dp = px * px + py * py;
 	float dn = nx * nx + ny * ny;
 	return dp < dn ? -d : d;
+}
+
+// Ellipse in L Inf Norm space https://www.shadertoy.com/view/7tj3DR
+float sdEllipseLinf(float px, float py, float ex, float ey) {
+	px = fabsf(px);
+	py = fabsf(py);
+	float ay = px-ex;
+	float ax = py-ey;
+	px = fmaxf(px,ax);
+	py = fmaxf(py,ay);
+	float m = ex*ex+ey*ey;
+	float d = py-px;
+	return px - (ey*sqrtf(m-d*d)-ex*d) * ex/m;
 }
 
 // Star 5 (https://www.shadertoy.com/view/3tSGDy)
