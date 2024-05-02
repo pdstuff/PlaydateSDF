@@ -4,7 +4,7 @@
 import "CoreLibs/graphics"
 import "Source/Lua/SDF2D.lua" -- Ensure you have put this file in the right location
 
-local x1, y1, x2, y2 = 10, 50, 100, 140 -- line segment
+local x1, y1, x2, y2 = 10, 50, 100, 150 -- line segment
 local ex, ey, ew, eh = 160, 120, 120, 70 -- ellipse; x y at centre
 local cx, cy, cr = 300, 120, 50 -- circle
 local intr, ints = 6, 100 -- for drawing: intersection radius and reflected scale
@@ -32,7 +32,6 @@ function ellipseNormal(x, y, w, h)
 end
 
 function drawEllipseIntersectionAndReflection(x1, y1, x2, y2, ex, ey, ew, eh, xi, yi)
-	if xi == nil then return end
 	playdate.graphics.fillCircleAtPoint(xi, yi, intr)
 	local nx, ny = ellipseNormal(xi-ex, yi-ey, ew/2, eh/2)		
 	if (x2-x1)*nx + (y2-y1)*ny < 0 then -- checks outside not inside
@@ -42,7 +41,6 @@ function drawEllipseIntersectionAndReflection(x1, y1, x2, y2, ex, ey, ew, eh, xi
 end	
 
 function drawCircleIntersectionAndReflection(x1, y1, x2, y2, cx, cy, cr, xi, yi)
-	if xi == nil then return end
 	playdate.graphics.fillCircleAtPoint(xi, yi, intr)
 	local nx, ny, _ = grCircle(xi-cx, yi-cy, cr)
 	if (x2-x1)*nx + (y2-y1)*ny < 0 then -- checks outside not inside
@@ -58,12 +56,12 @@ function drawScene()
 end
 
 function drawIntersections()
-	local int1x, int1y, int2x, int2y = iSegmentEllipse2D(x1, y1, x2, y2, ex, ey, ew, eh)
-	drawEllipseIntersectionAndReflection(x1, y1, x2, y2, ex, ey, ew, eh, int1x, int1y)
-	drawEllipseIntersectionAndReflection(x1, y1, x2, y2, ex, ey, ew, eh, int2x, int2y)
-	local int1x, int1y, int2x, int2y = iSegmentCircle2D(x1, y1, x2, y2, cx, cy, cr)
-	drawCircleIntersectionAndReflection(x1, y1, x2, y2, cx, cy, cr, int1x, int1y)
-	drawCircleIntersectionAndReflection(x1, y1, x2, y2, cx, cy, cr, int2x, int2y)
+	local i1x, i1y, i2x, i2y = iSegmentEllipse2D(x1, y1, x2, y2, ex, ey, ew, eh)
+	if i1x ~= nil then drawEllipseIntersectionAndReflection(x1, y1, x2, y2, ex, ey, ew, eh, i1x, i1y) end
+	if i2x ~= nil then drawEllipseIntersectionAndReflection(x1, y1, x2, y2, ex, ey, ew, eh, i2x, i2y) end
+	local i1x, i1y, i2x, i2y = iSegmentCircle2D(x1, y1, x2, y2, cx, cy, cr)
+	if i1x ~= nil then drawCircleIntersectionAndReflection(x1, y1, x2, y2, cx, cy, cr, i1x, i1y) end
+	if i2x ~= nil then drawCircleIntersectionAndReflection(x1, y1, x2, y2, cx, cy, cr, i2x, i2y) end
 end
 
 function playdate.update()
