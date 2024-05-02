@@ -11,5 +11,6 @@ Examples included:
 - pd_render.lua simply visualises an SDF shape
 - pd_bench.lua benchmarks the SDFs
 - pd_complex.lua showing a more complex use case
+- pd_intersects.lua showing how to calculate the intersections between a line segment and a circle or ellipse
 
 Note that Examples/Lua_C_Bindings/Sprites is a duplicate of pd_sprites.lua showing how to include pure C functions in your Lua based game.

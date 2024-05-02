@@ -16,6 +16,18 @@ local atan = math.atan
 local sqrt = math.sqrt
 local pow = math.pow
 
+--[[
+	File contains:
+	- Signed distance functions
+	- Gradient functions
+	- Intersection functions
+--]]
+
+
+--[[
+	Signed distance functions
+--]]
+
 -- Circle (https://www.shadertoy.com/view/3ltSW2)
 function sdCircle(px, py, r)
 	return sqrt(px*px+py*py) - r 
@@ -819,4 +831,88 @@ function sdPolygon(px, py, vx, vy, n)
 		j = i
 	end
 	return s * sqrt(d)
+end
+
+
+--[[
+	Gradient functions
+--]]
+
+-- Normal (and distance) for a Circle and point
+-- Given a point px, py 
+-- Return the normal for a circle at origin and distance to surface
+function grCircle(px, py, r)
+	local d = sqrt(px * px + py * py)
+	return px/d, py/d, d-r
+end
+
+--[[
+	Intersection functions
+--]]
+
+-- 2D Ray Circle intersection
+-- Adapted from 3D GLSL Ray Sphere method by @iq at https://www.shadertoy.com/view/4d2XWV  
+-- Given a ray from px, py with (normalised) direction dx, dy and a circle at cx, cy with radius r
+-- Return distances d1, d2 to the two possible intersections (nil denotes no intersection)
+function iCircle2D(px, py, dx, dy, cx, cy, r)
+	local ox = px - cx
+	local oy = py - cy
+	local b = ox * dx + oy * dy
+	local qx = ox - b * dx
+	local qy = oy - b * dy
+	local h = r * r - (qx * qx + qy * qy)
+	if h < 0 then return nil, nil end
+	h = sqrt(h)
+	return -b - h, -b + h
+end
+
+-- 2D Ray Ellipse intersection
+-- Adapted from 3D GLSL Ray Ellipsoid method by @iq at https://www.shadertoy.com/view/MlsSzn
+-- Given a ray from px, py with (unnormalised) direction dx, dy and an ellipse at origin with radius radii w, h
+-- Return distances d1, d2 to the two possible intersections (nil denotes no intersection)
+function iEllipse2D(px, py, dx, dy, w, h)
+	local cn, cy, nx, ny = px/w, py/h, dx/w, dy/h
+	local a, b = nx*nx+ny*ny, cn*nx+cy*ny
+	local h = b * b - a * (cn*cn+cy*cy- 1 )
+	if (h < 0.0) then return nil,nil end
+	h = sqrt(h)
+	return (-b-h)/a,(-b+h)/a
+end
+
+-- 2D Line Segment Circle intersection
+-- Given a line from point x1, y1 to x2, y2 and a circle at centre cx, cy with radius r
+-- Return coordinates x1, y1, x2, y2 to the two possible intersections (nil denotes no intersection)
+function iSegmentCircle2D(x1, y1, x2, y2, cx, cy, r)
+
+	-- normalise the line to a ray
+	local m0, m1 = x2-x1, y2-y1
+	local l = sqrt(m0*m0+m1*m1)	
+	local dx, dy = m0/l, m1/l	
+	
+	-- calculate Ray Circle intersection
+	local t1,t2 = iCircle2D(x1, y1, dx, dy, cx, cy, r)
+
+	-- calculate intersection points along the line
+	if t1 == nil and t2 == nil then return nil, nil, nil, nil end
+	local i1x, i1y, i2x, i2y = nil, nil, nil, nil
+	if t1 < l then i1x, i1y = x1 + t1 * dx, y1 + t1 * dy end
+	if t2 < l then i2x, i2y = x1 + t2 * dx, y1 + t2 * dy end	
+	return i1x, i1y, i2x, i2y
+
+end
+
+-- 2D Line Segment Ellipse intersection
+-- Given a line from point x1, y1 to x2, y2 and an ellipse at origin with radii w, h
+-- Return coordinates x1, y1, x2, y2 to the two possible intersections (nil denotes no intersection)
+function iSegmentEllipse2D(x1, y1, x2, y2, ox, oy, w, h)
+	local rox, roy, rdx, rdy = x1-ox, y1-oy, x2-x1, y2-y1
+	local tv1,tv2 = iEllipse2D(rox, roy, rdx, rdy, w/2, h/2)
+	local i1x, i1y, i2x, i2y = nil, nil, nil, nil
+	if tv1 ~= nil and tv1 >= 0 and tv1 <= 1 then
+		i1x, i1y = rox+tv1*rdx+ox, roy+tv1*rdy+oy
+	end
+	if tv2 ~= nil and tv2 >= 0 and tv2 <= 1 then 
+		i2x, i2y = rox+tv2*rdx+ox, roy+tv2*rdy+oy
+	end
+	return i1x, i1y, i2x, i2y	
 end
