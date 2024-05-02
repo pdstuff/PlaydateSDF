@@ -537,6 +537,7 @@ end
 -- Horseshoe (https://www.shadertoy.com/view/WlSGW1)
 function sdHorseshoe(px, py, cx, cy, r, le, th ) -- c:aperture, r:radius, le:length, th:thickness
 	px = ((px >= 0) and px or -px)
+	py = -py
 	local l = sqrt(px * px + py * py)
 	local tx = -cx * px + cy * py
 	py = cy * px + cx * py

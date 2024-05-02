@@ -461,6 +461,7 @@ float sdRing(float px, float py, float nx, float ny, float r, float th) {
 // Horseshoe (https://www.shadertoy.com/view/WlSGW1)
 float sdHorseshoe(float px, float py, float cx, float cy, float r, float le, float th) {
 	px = fabsf(px);
+	py = -py;
 	float l = sqrtf(px * px + py * py);
 	float tx = -cx * px + cy * py;
 	py = cy * px + cx * py;
