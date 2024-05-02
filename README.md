@@ -38,6 +38,8 @@ I'll endeavour to add simpler, more granular examples in the imminent future.
 
 ![Complex](https://github.com/pdstuff/PlaydateSDF/blob/main/Assets/complex.gif)
 
+![Intersects](https://github.com/pdstuff/PlaydateSDF/blob/main/Assets/circleintersects.gif)
+
 The library is released under MIT License. If you make use of any of the code here, please credit:
 - @robga https://github.com/pdstuff/PlaydateSDF/
 - @iq https://iquilezles.org/articles/distfunctions2d/
